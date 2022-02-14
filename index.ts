@@ -48,8 +48,6 @@ app.post('/', [
                     .isLength({ min: 1, max: 4 }),
     check('name', 'Name length should be 4 to 20 characters')
                     .isLength({ min: 4, max: 20 }),
-  //  check('DriverDOB', ' Driver_DOB should be 8 to 8 characters')
-    //              .isLength({ min: 8, max: 8 }),
     check('DriverAdrNO', ' DriverAdrNO should be 5 to 5 characters')
                     .isLength({ min: 5, max: 5 }),
     check('DriverLicense', ' DriverLicense should be 4 to 4 characters')
