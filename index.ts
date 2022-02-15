@@ -162,6 +162,26 @@ app.post("/drivers", (req, res) => {
 
 });
 
+/*
+//Put
+app.put('/drivers/:id' , (req, res) => {
+    const DriverID = req.params.id;
+    const Name = req.body.Name;
+    const DriverAdrNO = req.body.DriverAdrNO;
+    const DriverLicense = req.body.DriverLicense;
+
+    var query = 'UPDATE Driver SET  Name = ?, DriverAdrNO = ?, DriverLicense = ?, WHERE DriverID = ?';
+    mysqlConnection.query(query,[Name, DriverAdrNO, DriverLicense, DriverID], (error, result) => {       
+                    if (error) {
+                        console.log(error);
+                    } else {
+                        res.send("Values updated");
+                    }
+                }
+            );
+
+        });
+  */          
        
 //put
    app.put('/DriverID/:driverid/Name/:name/DriverAdrNO/:driveradrno/DriverLicense/:driverlicense', (req, res) => {
