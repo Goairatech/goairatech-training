@@ -41,77 +41,30 @@ JSON.stringify(err, undefined, 2));
 });
 
 
-
-// check() is a middleware used to validate
-app.post('/', [
-    check('Driver_ID', 'Driver_ID length should be 1 to 4 characters')
-                    .isLength({ min: 1, max: 4 }),
-    check('name', 'Name length should be 4 to 20 characters')
-                    .isLength({ min: 4, max: 20 }),
-    check('DriverAdrNO', ' DriverAdrNO should be 5 to 5 characters')
-                    .isLength({ min: 5, max: 5 }),
-    check('DriverLicense', ' DriverLicense should be 4 to 4 characters')
-                    .isLength({ min: 4, max: 4 }),
-], (req: express.Request, res: express.Response) => {
-
-    // validationResult function checks whether
-    // any occurs or not and return an object
-    const errors = validationResult(req);
-
-    // If some error occurs, then this block of code will run
-    if (!errors.isEmpty()) {
-        res.json(errors)
-    }
-
-    else {
-        res.send("Successfully validated")
-    }
-});
-
-
-//Get all Drivers
-   app.get('/:drivers',  async (req, res) => {
-    const DriverID = req.body.DriverID;
-    const Name = req.body.Name;
-    const DriverAdrNO = req.body.DriverAdrNO;
-    const DriverLicense = req.body.DriverLicense;
-
-           mysqlConnection.query('SELECT * FROM Driver', (err, rows, fields)=>{
-            req.params.drivers
+//Get by id 
+   app.get('/drivers/:driverId',  async (req, res) => {
+           mysqlConnection.query('SELECT * FROM Driver WHERE DriverID =?', [req.params.driverId], (err, rows, fields)=>{
             try {
                 res.send(rows);
            } catch (error) {
                console.error(error);
             }
           })
-       });
+});
 
 
-//Get 
-app.get('/DriverID/:driverid/Name/:name/DriverAdrNO/:driveradrno/DriverLicense/:driverlicense',
-(req, res) => {
-     
-   mysqlConnection.query('SELECT * FROM  driver WHERE  driverid = ?', [req.params.driverid], function(err : any, rows : any){
-
-    res.send({
-        DriverID: req.params.driverid,
-        Name: req.params.name,
-        DriverAdrNO: req.params.driveradrno,
-        DriverLicense: req.params.driverlicense
+//Get all drivers
+app.get('/drivers',(req, res) => {
+    mysqlConnection.query('SELECT * FROM  driver', [], function(err : any, rows : any){
+        console.log(rows)
+        res.send(rows);
     });
-})
 });
 
 
 //Delete
-app.delete('/drivers/:id',(req,res)=>{
-    const DriverID = req.body.DriverID;
-    const Name = req.body.Name;
-    const DriverAdrNO = req.body.DriverAdrNO;
-    const DriverLicense = req.body.DriverLicense;
-
-    mysqlConnection.query('DELETE  FROM Driver WHERE DriverID = ?' ,[req.params.id], (err, rows, fields)=>{
-        req.params.id
+app.delete('/drivers/:driverId',(req,res)=>{
+    mysqlConnection.query('DELETE  FROM Driver WHERE DriverID = ?' ,[req.params.driverId], (err, rows, fields)=>{
         if(!err)
         res.send('Deleted successfully.');
         else
@@ -120,18 +73,17 @@ app.delete('/drivers/:id',(req,res)=>{
 
 });
 
-
 //post
 app.post("/drivers", (req, res) => {
-    const DriverID = req.body.DriverID;
+    
     const Name = req.body.Name;
     const DriverAdrNO = req.body.DriverAdrNO;
     const DriverLicense = req.body.DriverLicense;
 
          
     mysqlConnection.query(
-        "INSERT INTO driver (DriverID, Name,  DriverAdrNO, DriverLicense) VALUES (?,?,?,?)",
-        [DriverID, Name, DriverAdrNO, DriverLicense],
+        "INSERT INTO driver (Name,  DriverAdrNO, DriverLicense) VALUES (?,?,?)",
+        [Name, DriverAdrNO, DriverLicense],
         (err, result) => {
             if (err) {
                 console.log(err);
@@ -142,21 +94,24 @@ app.post("/drivers", (req, res) => {
    );
 
 });
-
        
 //put
-   app.put('/DriverID/:driverid/Name/:name/DriverAdrNO/:driveradrno/DriverLicense/:driverlicense', (req, res) => {
+   app.put('/drivers/:driverid', (req, res) => {
+    const DriverID = req.params.driverid;
+    const Name = req.body.Name;
+    const DriverAdrNO = req.body.DriverAdrNO;
+    const DriverLicense = req.body.DriverLicense;
   
-    var query = 'UPDATE Driver SET  Name = ?, DriverAdrNO = ?, DriverLicense = ?, WHERE DriverID = ?';
-    mysqlConnection.query(query,[req.body, req.params], (error, rows) => {    
+    var query = 'UPDATE Driver SET  Name = ?, DriverAdrNO = ?, DriverLicense = ? WHERE DriverID = ?';
+    mysqlConnection.query(query,[Name, DriverAdrNO, DriverLicense, DriverID], (error, rows) => {    
     
         res.send({
         data: req.body,
         params:{
-        DriverID: req.params.driverid,
-        Name: req.params.name,
-        DriverAdrNO: req.params.driveradrno,
-        DriverLicense: req.params.driverlicense
+        DriverID: DriverID,
+        Name: Name,
+        DriverAdrNO: DriverAdrNO,
+        DriverLicense: DriverLicense
       }
    })
 
