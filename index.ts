@@ -48,8 +48,6 @@ app.post('/', [
                     .isLength({ min: 1, max: 4 }),
     check('name', 'Name length should be 4 to 20 characters')
                     .isLength({ min: 4, max: 20 }),
-  //  check('DriverDOB', ' Driver_DOB should be 8 to 8 characters')
-    //              .isLength({ min: 8, max: 8 }),
     check('DriverAdrNO', ' DriverAdrNO should be 5 to 5 characters')
                     .isLength({ min: 5, max: 5 }),
     check('DriverLicense', ' DriverLicense should be 4 to 4 characters')
@@ -71,70 +69,30 @@ app.post('/', [
 });
 
 
+//Get all Drivers
+   app.get('/:drivers',  async (req, res) => {
+    const DriverID = req.body.DriverID;
+    const Name = req.body.Name;
+    const DriverAdrNO = req.body.DriverAdrNO;
+    const DriverLicense = req.body.DriverLicense;
 
-//get all drivers
-app.get('/drivers', async (req,res)=>{
-    mysqlConnection.query('SELECT * FROM Driver',(err, rows, fields)=>{
-     try {
-         res.send(rows);
-    } catch (error) {
-        console.error(error);
-     }
-   })
-});
+           mysqlConnection.query('SELECT * FROM Driver', (err, rows, fields)=>{
+            req.params.drivers
+            try {
+                res.send(rows);
+           } catch (error) {
+               console.error(error);
+            }
+          })
+       });
 
 
-/*
-app.get('/driver/:id', (req, res) => {
-
-    var pool = mysql.createPool({
-        host:'localhost',
-        user : 'root',
-        password: 'password@123',
-        database : 'DRIVERDB',
-        connectionLimit : 10,
-        multipleStatements: true
-    
-    });
-    
-pool.getConnection(function (err : any,conn :any) {
-    if (err)
-    {
-        console.log('Enterd into error')
-        console.log(err)
-        res.send({
-            success: false,
-            statusCode: 500,
-            message: 'Getting error during the connection'
-        })
-        return;
-    }
-    console.log('The id: '+ req.params.id);
-
-    conn.query('SELECT * FROM  driver WHERE  driverid = ?', [req.params.id], function(err : any, rows : any){
-        if(err){
-            conn.release();
-            return res.send({
-                success: false,
-                statusCode: 400
-            });
-        }
-        res.send({
-            message: 'success',
-            statusCode: 200,
-            data: rows
-        });
-
-        conn.release();
-    
-      })
-  })
-
-})  
-*/
-        
+//Get 
 app.get('/DriverID/:driverid/Name/:name/DriverAdrNO/:driveradrno/DriverLicense/:driverlicense',
 (req, res) => {
+     
+   mysqlConnection.query('SELECT * FROM  driver WHERE  driverid = ?', [req.params.driverid], function(err : any, rows : any){
+
     res.send({
         DriverID: req.params.driverid,
         Name: req.params.name,
@@ -142,10 +100,18 @@ app.get('/DriverID/:driverid/Name/:name/DriverAdrNO/:driveradrno/DriverLicense/:
         DriverLicense: req.params.driverlicense
     });
 })
+});
+
 
 //Delete
 app.delete('/drivers/:id',(req,res)=>{
-    mysqlConnection.query('DELETE  FROM Driver WHERE DriverID = ?' ,[req.params.id],(err, rows, fields)=>{
+    const DriverID = req.body.DriverID;
+    const Name = req.body.Name;
+    const DriverAdrNO = req.body.DriverAdrNO;
+    const DriverLicense = req.body.DriverLicense;
+
+    mysqlConnection.query('DELETE  FROM Driver WHERE DriverID = ?' ,[req.params.id], (err, rows, fields)=>{
+        req.params.id
         if(!err)
         res.send('Deleted successfully.');
         else
@@ -155,21 +121,7 @@ app.delete('/drivers/:id',(req,res)=>{
 });
 
 
-//Post
-app.post('/DriverID/:driverid/Name/:name/DriverAdrNO/:driveradrno/DriverLicense/:driverlicense', (req, res) => {
-    res.send({
-        data: req.body,
-        params:{
-        DriverID: req.params.driverid,
-        Name: req.params.name,
-        DriverAdrNO: req.params.driveradrno,
-        DriverLicense: req.params.driverlicense
-      }
-   })
-
- })
- 
-/*
+//post
 app.post("/drivers", (req, res) => {
     const DriverID = req.body.DriverID;
     const Name = req.body.Name;
@@ -190,29 +142,27 @@ app.post("/drivers", (req, res) => {
    );
 
 });
-*/
 
+       
+//put
+   app.put('/DriverID/:driverid/Name/:name/DriverAdrNO/:driveradrno/DriverLicense/:driverlicense', (req, res) => {
+  
+    var query = 'UPDATE Driver SET  Name = ?, DriverAdrNO = ?, DriverLicense = ?, WHERE DriverID = ?';
+    mysqlConnection.query(query,[req.body, req.params], (error, rows) => {    
+    
+        res.send({
+        data: req.body,
+        params:{
+        DriverID: req.params.driverid,
+        Name: req.params.name,
+        DriverAdrNO: req.params.driveradrno,
+        DriverLicense: req.params.driverlicense
+      }
+   })
 
-//Put
-app.put("/drivers", (req, res) => {
-    const DriverID = req.body.DriverID;
-    const Name = req.body.Name;
-    const DriverAdrNO = req.body.DriverAdrNO;
-    const DriverLicense = req.body.DriverLicense;
+ }) 
+ 
+});
+             
 
-
-    mysqlConnection.query ('update driver set  DriverID = ?, Name = ?, DriverAdrNO = ?,  DriverLicense = ?',
-    [DriverID, Name, DriverAdrNO, DriverLicense,],
-                (err, result) => {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        res.send("Values updated");
-                    }
-                }
-            );
-
-        });
-
-        
 app.listen(3000,() => console.log('Express Server is running at port on  3000'));
