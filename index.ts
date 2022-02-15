@@ -19,7 +19,7 @@ app.use(bodyparser.json())
 app.use(express.urlencoded({extended: false}))
 app.use(express.json())
 
-/*
+
  var mysqlConnection = mysql.createConnection({
     host:'localhost',
     user : 'root',
@@ -48,6 +48,8 @@ app.post('/', [
                     .isLength({ min: 1, max: 4 }),
     check('name', 'Name length should be 4 to 20 characters')
                     .isLength({ min: 4, max: 20 }),
+  //  check('DriverDOB', ' Driver_DOB should be 8 to 8 characters')
+    //              .isLength({ min: 8, max: 8 }),
     check('DriverAdrNO', ' DriverAdrNO should be 5 to 5 characters')
                     .isLength({ min: 5, max: 5 }),
     check('DriverLicense', ' DriverLicense should be 4 to 4 characters')
@@ -82,18 +84,7 @@ app.get('/drivers', async (req,res)=>{
 });
 
 
-//Get
-app.get('/DriverID/:driverid/Name/:name/DriverAdrNO/:driveradrno/DriverLicense/:driverlicense',
-(req, res) => {
-    res.send({
-        DriverID: req.params.driverid,
-        Name: req.params.name,
-        DriverAdrNO: req.params.driveradrno,
-        DriverLicense: req.params.driverlicense
-    });
-})
-*/
-
+/*
 app.get('/driver/:id', (req, res) => {
 
     var pool = mysql.createPool({
@@ -140,9 +131,18 @@ pool.getConnection(function (err : any,conn :any) {
   })
 
 })  
+*/
+        
+app.get('/DriverID/:driverid/Name/:name/DriverAdrNO/:driveradrno/DriverLicense/:driverlicense',
+(req, res) => {
+    res.send({
+        DriverID: req.params.driverid,
+        Name: req.params.name,
+        DriverAdrNO: req.params.driveradrno,
+        DriverLicense: req.params.driverlicense
+    });
+})
 
-
-/*
 //Delete
 app.delete('/drivers/:id',(req,res)=>{
     mysqlConnection.query('DELETE  FROM Driver WHERE DriverID = ?' ,[req.params.id],(err, rows, fields)=>{
@@ -154,7 +154,7 @@ app.delete('/drivers/:id',(req,res)=>{
 
 });
 
-*/
+
 //Post
 app.post('/DriverID/:driverid/Name/:name/DriverAdrNO/:driveradrno/DriverLicense/:driverlicense', (req, res) => {
     res.send({
@@ -168,25 +168,31 @@ app.post('/DriverID/:driverid/Name/:name/DriverAdrNO/:driveradrno/DriverLicense/
    })
 
  })
-
+ 
 /*
-app.post('/data', function(req, res){
+app.post("/drivers", (req, res) => {
+    const DriverID = req.body.DriverID;
+    const Name = req.body.Name;
+    const DriverAdrNO = req.body.DriverAdrNO;
+    const DriverLicense = req.body.DriverLicense;
 
-    var username=req.body.name;
-
-    connection.query("INSERT INTO `names` (name) SET ?", username.toString(), function(err, result){
-        if(err) throw err;
-
-        console.log("1 record inserted");
-    });
-
-    res.send(username);
+         
+    mysqlConnection.query(
+        "INSERT INTO driver (DriverID, Name,  DriverAdrNO, DriverLicense) VALUES (?,?,?,?)",
+        [DriverID, Name, DriverAdrNO, DriverLicense],
+        (err, result) => {
+            if (err) {
+                console.log(err);
+            } else {
+                res.send("Values Inserted");
+            }  
+        }
+   );
 
 });
-
 */
 
-/*
+
 //Put
 app.put("/drivers", (req, res) => {
     const DriverID = req.body.DriverID;
@@ -208,5 +214,5 @@ app.put("/drivers", (req, res) => {
 
         });
 
-        */
+        
 app.listen(3000,() => console.log('Express Server is running at port on  3000'));
