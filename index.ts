@@ -4,7 +4,7 @@ import bodyparser from 'body-parser';
 import { check, validationResult } from 'express-validator';
 import mysql from 'mysql';
 import { nextTick } from 'process';
-
+import jsonwebtoken from 'jsonwebtoken';
 
 
 var urlencodePareser  = bodyparser.urlencoded({ extended: false})
@@ -43,11 +43,16 @@ JSON.stringify(err, undefined, 2));
 //Get by id 
    app.get('/drivers/:driverId', (req, res) => {
       mysqlConnection.query('SELECT * FROM Driver WHERE DriverID =?', [req.params.driverId], (err, rows, fields)=>{
-        
+
+        let token =jsonwebtoken.sign({   
+
+        }, "mderplsnvreyufuuhfgywbdhwwwjdhdihjjdsddhwewkhg")
+
+       console.log(token)
              if(Object.keys(rows).length === 0){
                  res.sendStatus(404);
                 }else{
-                 console.log(rows + 'This is rows');
+                 console.log(rows + '');
                  res.status(200).json({drivers: rows});   
               }
            });
@@ -55,11 +60,12 @@ JSON.stringify(err, undefined, 2));
 
 //Get all drivers
 app.get('/drivers',(req, res) => {
-    mysqlConnection.query('SELECT * FROM  driver', [], function(err : any, rows : any){
+    mysqlConnection.query('SELECT * FROM  driver', [], function(err : any, rows : any){  
         console.log(rows)
         res.send(rows);
     });
 });
+
 
 
 //Delete
@@ -108,7 +114,7 @@ app.post('/drivers',   urlencodePareser,[
         "INSERT INTO driver (Name,  DriverAdrNO, DriverLicense) VALUES (?,?,?)",
         [Name, DriverAdrNO, DriverLicense], 
 
-    )
+    );
     const errors = validationResult(req);
       
     if (!errors.isEmpty()) {
@@ -121,6 +127,7 @@ app.post('/drivers',   urlencodePareser,[
  
   }
 );
+
 
 //put
    app.put('/drivers/:driverid',  urlencodePareser,[
